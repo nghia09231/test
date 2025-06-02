@@ -1,0 +1,93 @@
+-- Bảng khách hàng
+CREATE TABLE KhachHang (
+    MaKH INT PRIMARY KEY IDENTITY,
+    TenKH NVARCHAR(100),
+    DiaChi NVARCHAR(200),
+    SoDienThoai NVARCHAR(15),
+    Email NVARCHAR(100)
+);
+
+-- Bảng vật liệu
+CREATE TABLE VatLieu (
+    MaVL INT PRIMARY KEY IDENTITY,
+    TenVL NVARCHAR(100),
+    DonViTinh NVARCHAR(50),
+    GiaNhap DECIMAL(18, 2),
+    GiaBan DECIMAL(18, 2),
+    TonKho INT
+);
+
+-- Bảng nhập hàng
+CREATE TABLE PhieuNhap (
+    MaPN INT PRIMARY KEY IDENTITY,
+    NgayNhap DATE,
+    NhaCungCap NVARCHAR(100),
+    TongTien DECIMAL(18, 2)
+);
+
+CREATE TABLE ChiTietPhieuNhap (
+    MaPN INT,
+    MaVL INT,
+    SoLuong INT,
+    DonGia DECIMAL(18,2),
+    PRIMARY KEY (MaPN, MaVL),
+    FOREIGN KEY (MaPN) REFERENCES PhieuNhap(MaPN),
+    FOREIGN KEY (MaVL) REFERENCES VatLieu(MaVL)
+);
+
+-- Bảng hóa đơn bán hàng
+CREATE TABLE HoaDon (
+    MaHD INT PRIMARY KEY IDENTITY,
+    MaKH INT,
+    NgayBan DATE,
+    TongTien DECIMAL(18,2),
+    FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH)
+);
+
+CREATE TABLE ChiTietHoaDon (
+    MaHD INT,
+    MaVL INT,
+    SoLuong INT,
+    DonGia DECIMAL(18,2),
+    PRIMARY KEY (MaHD, MaVL),
+    FOREIGN KEY (MaHD) REFERENCES HoaDon(MaHD),
+    FOREIGN KEY (MaVL) REFERENCES VatLieu(MaVL)
+);
+
+-- Bảng công nợ
+CREATE TABLE CongNo (
+    MaCN INT PRIMARY KEY IDENTITY,
+    MaKH INT,
+    NgayGhi DATE,
+    SoTien DECIMAL(18,2),
+    GhiChu NVARCHAR(200),
+    FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH)
+);
+INSERT INTO KhachHang ( MaKH,TenKH, DiaChi, SoDienThoai, Email) VALUES
+('1',N'Nguyễn Văn A', N'123 Lê Lợi, Q1, TP.HCM', '0901234567', 'a@gmail.com'),
+('2',N'Trần Thị B', N'456 Trần Hưng Đạo, Q5, TP.HCM', '0907654321', 'b@gmail.com');
+
+INSERT INTO VatLieu (TenVL, DonViTinh, GiaNhap, GiaBan, TonKho) VALUES
+(N'Xi măng Hà Tiên', N'Bao', 70000, 90000, 100),
+(N'Cát vàng', N'M3', 200000, 250000, 50),
+(N'Gạch ống', N'Viên', 1100, 1500, 1000);
+INSERT INTO PhieuNhap (NgayNhap, NhaCungCap, TongTien) VALUES
+('2025-04-25', N'Công ty VLXD ABC', 10000000),
+('2025-04-26', N'Công ty VLXD XYZ', 5000000);
+
+-- Giả sử MaPN 1 và 2 được sinh tự động
+INSERT INTO ChiTietPhieuNhap (MaPN, MaVL, SoLuong, DonGia) VALUES
+(1, 1, 100, 70000), -- Xi măng
+(1, 2, 20, 200000), -- Cát
+(2, 3, 1000, 1100); -- Gạch
+INSERT INTO HoaDon (MaKH, NgayBan, TongTien) VALUES
+(1, '2025-04-27', 2000000),
+(2, '2025-04-28', 1500000);
+
+INSERT INTO ChiTietHoaDon (MaHD, MaVL, SoLuong, DonGia) VALUES
+(1, 1, 20, 90000), -- Xi măng
+(1, 3, 200, 1500), -- Gạch
+(2, 2, 5, 250000); -- Cát
+INSERT INTO CongNo (MaKH, NgayGhi, SoTien, GhiChu) VALUES
+(1, '2025-04-28', 500000, N'Chưa thanh toán đủ'),
+(2, '2025-04-29', 1500000, N'Nợ đầu kỳ');
